@@ -10,7 +10,6 @@ includeBody: true
 # description: should stubs be included
 # type: boolean
 includeStubs: true
-
 # description: undefined
 # type: array
 # ignore: TODO
