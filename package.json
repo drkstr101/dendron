@@ -1,0 +1,14 @@
+{
+  "name": "Dendron",
+  "version": "1.0.0",
+  "description": "Personal knowledge space (Dendron)",
+  "main": "next.config.js",
+  "repository": "https://github.com/drkstr101/Dendron",
+  "author": "Aaron R Miller<aaron@stackbit.com>",
+  "license": "MIT",
+  "private": true,
+  "packageManager": "yarn@3.2.1",
+  "devDependencies": {
+    "@dendronhq/dendron-cli": "latest"
+  }
+}
