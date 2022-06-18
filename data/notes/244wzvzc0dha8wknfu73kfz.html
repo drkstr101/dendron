@@ -1,0 +1,161 @@
+<h1 id="annotations-system"><a aria-hidden="true" class="anchor-heading" href="#annotations-system"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>Annotations System</h1>
+<h2 id="annotations-tree-extractor"><a aria-hidden="true" class="anchor-heading" href="#annotations-tree-extractor"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>Annotations Tree Extractor</h2>
+<p>Source: <code>@stackbit-app/src/snippet/processors/HtmlProcessor/annotation-tree-extractor.js</code></p>
+<p>The tree extractor is the entry point to the annotations system, and is part of the <code>HtmlProcessor</code> module. Once the DOM is ready, pass the global <code>document</code> object into <code>extractAnnotationTree</code>. The results are then fed into the <code>resolveObjectsWithAnnotationTree</code> method </p>
+<pre class="language-ts"><code class="language-ts"><span class="token keyword module">export</span> <span class="token keyword">interface</span> <span class="token class-name"><span class="token maybe-class-name">Sourcemaps</span></span> <span class="token punctuation">{</span>
+  <span class="token punctuation">[</span>xpath<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">]</span><span class="token operator">:</span> <span class="token maybe-class-name">ElementSourcemap</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword module">export</span> <span class="token keyword">interface</span> <span class="token class-name"><span class="token maybe-class-name">ElementSourcemap</span></span> <span class="token punctuation">{</span>
+  file<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+  start<span class="token operator">?</span><span class="token operator">:</span> <span class="token maybe-class-name">ElementPosition</span><span class="token punctuation">;</span>
+  end<span class="token operator">?</span><span class="token operator">:</span> <span class="token maybe-class-name">ElementPosition</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword module">export</span> <span class="token keyword">interface</span> <span class="token class-name"><span class="token maybe-class-name">ElementPosition</span></span> <span class="token punctuation">{</span>
+  line<span class="token operator">:</span> <span class="token builtin">number</span><span class="token punctuation">;</span>
+  column<span class="token operator">:</span> <span class="token builtin">number</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword module">export</span> <span class="token keyword">interface</span> <span class="token class-name"><span class="token maybe-class-name">AnnotationsTree</span></span> <span class="token punctuation">{</span>
+  objectIds<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+  children<span class="token operator">:</span> <span class="token maybe-class-name">AnnotationsTreeNode</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword module">export</span> <span class="token keyword">interface</span> <span class="token class-name"><span class="token maybe-class-name">AnnotationsTreeNode</span></span> <span class="token punctuation">{</span>
+  oid<span class="token operator">:</span> <span class="token builtin">string</span> <span class="token operator">|</span> <span class="token keyword null nil">null</span><span class="token punctuation">;</span>
+  fp<span class="token operator">:</span> <span class="token maybe-class-name">AnnotationsTreeFieldPath</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+  xpath<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+  children<span class="token operator">:</span> <span class="token maybe-class-name">AnnotationsTreeNode</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword module">export</span> <span class="token keyword">interface</span> <span class="token class-name"><span class="token maybe-class-name">AnnotationsTreeFieldPath</span></span> <span class="token punctuation">{</span>
+  oid<span class="token operator">:</span> <span class="token builtin">string</span> <span class="token operator">|</span> <span class="token keyword null nil">null</span><span class="token punctuation">;</span>
+  fp<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+  loc<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+  hasOnlyTextNodes<span class="token operator">:</span> <span class="token builtin">boolean</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword module">export</span> <span class="token keyword">interface</span> <span class="token class-name"><span class="token known-class-name class-name">AnnotationError</span></span> <span class="token punctuation">{</span>
+  message<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+  elementXPath<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword module">export</span> <span class="token keyword">function</span> <span class="token function">extractAnnotationTree</span><span class="token punctuation">(</span><span class="token dom variable">document</span><span class="token operator">:</span> <span class="token maybe-class-name">Document</span><span class="token punctuation">)</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+  sourcemaps<span class="token operator">:</span> <span class="token maybe-class-name">Sourcemaps</span><span class="token punctuation">;</span>
+  annotationTree<span class="token operator">:</span> <span class="token maybe-class-name">AnnotationsTree</span><span class="token punctuation">;</span>
+  errors<span class="token operator">:</span> <span class="token known-class-name class-name">AnnotationError</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre>
+<h3 id="example"><a aria-hidden="true" class="anchor-heading" href="#example"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>Example</h3>
+<pre class="language-js"><code class="language-js"><span class="token punctuation">{</span>
+  <span class="token literal-property property">objectIds</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">'obj1'</span><span class="token punctuation">,</span> <span class="token string">'obj3'</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">{</span>
+      <span class="token literal-property property">oid</span><span class="token operator">:</span> <span class="token string">"obj1"</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">fp</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">xpath</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"/html"</span><span class="token punctuation">,</span> <span class="token string">"node"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+        <span class="token punctuation">{</span>
+          <span class="token literal-property property">oid</span><span class="token operator">:</span> <span class="token keyword null nil">null</span><span class="token punctuation">,</span>
+          <span class="token literal-property property">fp</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+            <span class="token punctuation">{</span> <span class="token literal-property property">oid</span><span class="token operator">:</span> <span class="token keyword null nil">null</span><span class="token punctuation">,</span> <span class="token literal-property property">fp</span><span class="token operator">:</span> <span class="token string">"author.title"</span><span class="token punctuation">,</span> <span class="token literal-property property">loc</span><span class="token operator">:</span> <span class="token string">""</span><span class="token punctuation">,</span> <span class="token literal-property property">hasOnlyTextNodes</span><span class="token operator">:</span> <span class="token boolean">true</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+          <span class="token punctuation">]</span><span class="token punctuation">,</span>
+          <span class="token literal-property property">xpath</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"/html"</span><span class="token punctuation">,</span> <span class="token string">"node[1]"</span><span class="token punctuation">,</span> <span class="token string">"inner[1]"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token punctuation">{</span>
+          <span class="token literal-property property">oid</span><span class="token operator">:</span> <span class="token keyword null nil">null</span><span class="token punctuation">,</span>
+          <span class="token literal-property property">fp</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">{</span> <span class="token literal-property property">oid</span><span class="token operator">:</span> <span class="token string">"obj3"</span><span class="token punctuation">,</span> <span class="token literal-property property">fp</span><span class="token operator">:</span> <span class="token string">"title"</span><span class="token punctuation">,</span> <span class="token literal-property property">loc</span><span class="token operator">:</span> <span class="token string">""</span> <span class="token punctuation">}</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+          <span class="token literal-property property">xpath</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"/html"</span><span class="token punctuation">,</span> <span class="token string">"node[1]"</span><span class="token punctuation">,</span> <span class="token string">"inner[2]"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token punctuation">]</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h3 id="finddescendantelements"><a aria-hidden="true" class="anchor-heading" href="#finddescendantelements"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>findDescendantElements</h3>
+<pre class="language-ts"><code class="language-ts"><span class="token keyword module">export</span> <span class="token keyword">type</span> <span class="token class-name"><span class="token maybe-class-name">Descendant</span></span> <span class="token operator">=</span> <span class="token punctuation">{</span> node<span class="token operator">:</span> <span class="token maybe-class-name">Element</span><span class="token punctuation">;</span> xpath<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token keyword">function</span> <span class="token function">findDescendantElements</span><span class="token punctuation">(</span>
+  node<span class="token operator">:</span> <span class="token maybe-class-name">Element</span><span class="token punctuation">,</span>
+  xpath<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token function-variable function">iteratee</span><span class="token operator">:</span> <span class="token punctuation">(</span>childNode<span class="token operator">:</span> <span class="token maybe-class-name">Element</span><span class="token punctuation">,</span> xpath<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token arrow operator">=></span> <span class="token builtin">boolean</span><span class="token punctuation">,</span>
+  options<span class="token operator">?</span><span class="token operator">:</span> <span class="token punctuation">{</span> recursive<span class="token operator">:</span> <span class="token builtin">boolean</span> <span class="token punctuation">}</span>
+<span class="token punctuation">)</span><span class="token operator">:</span> <span class="token maybe-class-name">Descendant</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+</code></pre>
+<p>Helper function that when given a DOM node and an XPath, return a list of DOM descendants nodes along with their absolute XPath.</p>
+<p>Elements are only added when the given iteratee function returns true.</p>
+<h2 id="annotation-tree-parser"><a aria-hidden="true" class="anchor-heading" href="#annotation-tree-parser"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>Annotation Tree Parser</h2>
+<p>Test: <code>packages/dev-common/__tests__/annotation-tree-parser.test.js</code></p>
+<h3 id="resolveobjectswithannotationtree"><a aria-hidden="true" class="anchor-heading" href="#resolveobjectswithannotationtree"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>resolveObjectsWithAnnotationTree</h3>
+<pre class="language-ts"><code class="language-ts"><span class="token keyword">function</span> <span class="token function">resolveObjectsWithAnnotationTree</span><span class="token punctuation">(</span>
+  annotationTree<span class="token operator">:</span> <span class="token maybe-class-name">AnnotationsTree</span><span class="token punctuation">,</span>
+  fieldData<span class="token operator">:</span> <span class="token builtin">any</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token punctuation">{</span> resolveAllReferences<span class="token operator">:</span> <span class="token builtin">boolean</span> <span class="token punctuation">}</span><span class="token operator">?</span>
+<span class="token punctuation">)</span><span class="token operator">:</span> <span class="token punctuation">{</span> pathMap<span class="token operator">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">;</span> objects<span class="token punctuation">;</span> errors<span class="token operator">:</span> <span class="token known-class-name class-name">AnnotationError</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre>
+<p>Receive a list of objectIds, and the annotationTree, and resolves the annotations into a pathMap, and returns any additional referenced objects that were used in the annotations. Also returns validation errors to the client.</p>
+<h3 id="parseannotationtree"><a aria-hidden="true" class="anchor-heading" href="#parseannotationtree"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>parseAnnotationTree</h3>
+<pre class="language-ts"><code class="language-ts"><span class="token keyword">function</span> <span class="token function">parseAnnotationTree</span><span class="token punctuation">(</span>
+  annotationTree<span class="token punctuation">,</span>
+  fieldData<span class="token punctuation">,</span>
+  <span class="token punctuation">{</span> parentOid<span class="token punctuation">,</span> parentFp <span class="token punctuation">}</span><span class="token operator">?</span>
+<span class="token punctuation">)</span><span class="token operator">:</span> <span class="token punctuation">{</span> pathMap<span class="token operator">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">;</span> pathMapForResolving<span class="token operator">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">;</span> errors<span class="token operator">:</span> <span class="token builtin">any</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre>
+<p>Recursion that goes over annotationTree, and parses out annotations using the fieldData to resolve and infer objectIds and partial fieldPaths (.field).
+Steps:</p>
+<ol>
+<li>parse 'data-sb-object-id' annotations and store context in parentOid to append to child annotations if they don't specify objectId explicitly</li>
+<li>parse 'data-sb-field-path' annotations (using resolveFp to resolve partials (.field), and parent objectIds), and create a pathMap that maps fieldPaths to xPaths.
+2.1. determine if any of the annotations is a container annotation and store it in context to pass to descendants.</li>
+<li>go over child nodes and run the recursion, merging any returned validation errors, and xpath matches.</li>
+</ol>
+<p>Return any resolved annotations as a pathMap,
+also returns pathMapForResolving, which includes partial fieldPaths for resolving references from any ancestor objectId.</p>
+<h3 id="resolvematchtype"><a aria-hidden="true" class="anchor-heading" href="#resolvematchtype"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>resolveMatchType</h3>
+<pre class="language-ts"><code class="language-ts"><span class="token keyword">function</span> <span class="token function">resolveMatchType</span><span class="token punctuation">(</span><span class="token dom variable">location</span><span class="token punctuation">)</span><span class="token operator">:</span> <span class="token builtin">string</span>
+</code></pre>
+<p>receives the xpath location, and resolves the matchType for highlighting (text, element, attribute)</p>
+<h3 id="resolvelocation"><a aria-hidden="true" class="anchor-heading" href="#resolvelocation"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>resolveLocation</h3>
+<pre class="language-ts"><code class="language-ts"><span class="token keyword">function</span> <span class="token function">resolveLocation</span><span class="token punctuation">(</span>annotationFp<span class="token punctuation">,</span> field<span class="token punctuation">)</span><span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+</code></pre>
+<p>parses the xpath location partial of an annotation ('objectId:field.path#location') and resolves defaults and fallbacks to return the final xpath.</p>
+<h2 id="annotation-utils"><a aria-hidden="true" class="anchor-heading" href="#annotation-utils"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>Annotation Utils</h2>
+<h3 id="fieldpathtofielddatapath"><a aria-hidden="true" class="anchor-heading" href="#fieldpathtofielddatapath"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>fieldPathToFieldDataPath</h3>
+<p>This method translates fieldPath (object.sections[0].title) to fieldDataPath (object.fields.sections.items[0].fields.title) It follows references, and returns both the fieldDataPath from the nearest object that has an ID, but also the fieldDataPath from the original passed object</p>
+<p>FieldDataPathsFromRoot contains fieldPaths to current fieldPathStr from every object in the reference chain. example: Oid1.fields.sections.items.1.fields.features.items.0.fields.featureTitle Oid2.fields.features.items.0.fields.featureTitle Oid3.fields.featureTitle all three fieldpaths are required to resolve every object in the reference chain</p>
+<pre class="language-typescript"><code class="language-typescript"><span class="token keyword">function</span> <span class="token function">fieldPathToFieldDataPath</span><span class="token punctuation">(</span>
+  objectId<span class="token punctuation">,</span>
+  fieldPathStr<span class="token punctuation">,</span>
+  fieldData
+<span class="token punctuation">)</span><span class="token operator">:</span> <span class="token punctuation">{</span> fieldDataPathsFromRoot<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span> fieldDataPath<span class="token operator">:</span> <span class="token builtin">string</span> <span class="token punctuation">}</span> <span class="token operator">|</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre>
+<h3 id="fieldpathtostring"><a aria-hidden="true" class="anchor-heading" href="#fieldpathtostring"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>fieldPathToString</h3>
+<p>This converts a fieldPath array to a string, it puts complex strings inside single quotes '', and uses square brackets [] for number keys.</p>
+<pre class="language-typescript"><code class="language-typescript"><span class="token keyword">function</span> <span class="token function">fieldPathToString</span><span class="token punctuation">(</span>fieldPath<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+</code></pre>
+<h3 id="appendorarray"><a aria-hidden="true" class="anchor-heading" href="#appendorarray"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>appendOrArray</h3>
+<p>Append item to an array in object given a path, or initialize if it doesn't exist.</p>
+<pre class="language-typescript"><code class="language-typescript"><span class="token keyword">function</span> <span class="token function">appendOrArray</span><span class="token punctuation">(</span>object<span class="token punctuation">,</span> path<span class="token punctuation">,</span> item<span class="token punctuation">)</span><span class="token operator">:</span> <span class="token keyword">void</span><span class="token punctuation">;</span>
+</code></pre>
+<h2 id="annotation-service"><a aria-hidden="true" class="anchor-heading" href="#annotation-service"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>Annotation Service</h2>
+<p>Source: <code>@stackbit/stackbit-dev/packages/stackbit-dev/src/services/annotation-errors.ts</code></p>
+<h3 id="logannotationerrors"><a aria-hidden="true" class="anchor-heading" href="#logannotationerrors"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>logAnnotationErrors</h3>
+<pre class="language-ts"><code class="language-ts"><span class="token keyword module">export</span> <span class="token keyword">type</span> <span class="token class-name"><span class="token known-class-name class-name">AnnotationError</span></span> <span class="token operator">=</span> <span class="token punctuation">{</span>
+  message<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+    elementXPath<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword module">export</span> <span class="token keyword">type</span> <span class="token class-name"><span class="token maybe-class-name">SourceMap</span></span> <span class="token operator">=</span> <span class="token punctuation">{</span>
+  file<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+    start<span class="token operator">?</span><span class="token operator">:</span> <span class="token punctuation">{</span> line<span class="token operator">:</span> <span class="token builtin">number</span> <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword module">export</span> <span class="token keyword">async</span> <span class="token keyword">function</span> <span class="token function">logAnnotationErrors</span><span class="token punctuation">(</span>
+  errors<span class="token operator">:</span> <span class="token builtin">any</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  logger<span class="token operator">:</span> <span class="token builtin">any</span><span class="token punctuation">,</span>
+  baseDir<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">,</span>
+  sourcemaps<span class="token operator">?</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token punctuation">[</span>p<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">]</span><span class="token operator">:</span> <span class="token builtin">any</span> <span class="token punctuation">}</span> <span class="token operator">|</span> <span class="token keyword nil">undefined</span>
+<span class="token punctuation">)</span><span class="token operator">:</span> <span class="token known-class-name class-name">Promise</span><span class="token operator">&#x3C;</span><span class="token keyword">void</span><span class="token operator">></span><span class="token punctuation">;</span>
+</code></pre>
+<p>Serialize a list of <code>AnnotationError</code> objects and send to the provided logger.</p>

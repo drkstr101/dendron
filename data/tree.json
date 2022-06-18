@@ -1,0 +1,216 @@
+{
+  "roots": [
+    {
+      "key": "tjo6ofe6jnmhoiu439b1w5m",
+      "title": "Root",
+      "icon": null,
+      "hasTitleNumberOutlined": false,
+      "vaultName": "vault",
+      "navExclude": false,
+      "children": [
+        {
+          "key": "zo0dkyv7938yq1gcx8uuziy",
+          "title": "Daily",
+          "icon": "plusOutlined",
+          "hasTitleNumberOutlined": false,
+          "vaultName": "vault",
+          "navExclude": false,
+          "children": [
+            {
+              "key": "l02m7lpqwqo79nush714k29",
+              "title": "Journal",
+              "icon": "plusOutlined",
+              "hasTitleNumberOutlined": false,
+              "vaultName": "vault",
+              "navExclude": false,
+              "children": [
+                {
+                  "key": "ete4j3cuiq0ih0pi0o3aao3",
+                  "title": "2022",
+                  "icon": "plusOutlined",
+                  "hasTitleNumberOutlined": false,
+                  "vaultName": "vault",
+                  "navExclude": false,
+                  "children": [
+                    {
+                      "key": "rusgp2b9zse8au65qii1azk",
+                      "title": "05",
+                      "icon": "plusOutlined",
+                      "hasTitleNumberOutlined": false,
+                      "vaultName": "vault",
+                      "navExclude": false,
+                      "children": [
+                        {
+                          "key": "upmbvixmnzovjmnp9whjagp",
+                          "title": "2022-05-24",
+                          "icon": null,
+                          "hasTitleNumberOutlined": false,
+                          "vaultName": "vault",
+                          "navExclude": false,
+                          "children": []
+                        },
+                        {
+                          "key": "q7aj38uv8dnumqrpxn10vk6",
+                          "title": "2022-05-26",
+                          "icon": null,
+                          "hasTitleNumberOutlined": false,
+                          "vaultName": "vault",
+                          "navExclude": false,
+                          "children": []
+                        },
+                        {
+                          "key": "oicfg9xisnq8qmv9z77zqa9",
+                          "title": "2022-05-27",
+                          "icon": null,
+                          "hasTitleNumberOutlined": false,
+                          "vaultName": "vault",
+                          "navExclude": false,
+                          "children": []
+                        },
+                        {
+                          "key": "d4se6e2fhbutosewbbta81a",
+                          "title": "2022-05-31",
+                          "icon": null,
+                          "hasTitleNumberOutlined": false,
+                          "vaultName": "vault",
+                          "navExclude": false,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "key": "ilbjp6rq879dcc2sdkjx4tg",
+                      "title": "06",
+                      "icon": "plusOutlined",
+                      "hasTitleNumberOutlined": false,
+                      "vaultName": "vault",
+                      "navExclude": false,
+                      "children": [
+                        {
+                          "key": "b3w46cf4yjy2d8iitxoymmb",
+                          "title": "2022-06-02",
+                          "icon": null,
+                          "hasTitleNumberOutlined": false,
+                          "vaultName": "vault",
+                          "navExclude": false,
+                          "children": []
+                        },
+                        {
+                          "key": "b0t8el1x3b5cb7qz1m9g9zg",
+                          "title": "2022-06-08",
+                          "icon": null,
+                          "hasTitleNumberOutlined": false,
+                          "vaultName": "vault",
+                          "navExclude": false,
+                          "children": []
+                        },
+                        {
+                          "key": "tq7vt8nv3jk1860gz5pk59s",
+                          "title": "2022-06-12",
+                          "icon": null,
+                          "hasTitleNumberOutlined": false,
+                          "vaultName": "vault",
+                          "navExclude": false,
+                          "children": []
+                        },
+                        {
+                          "key": "4dwcymngpio7nlu39c4ja7r",
+                          "title": "2022-06-18",
+                          "icon": null,
+                          "hasTitleNumberOutlined": false,
+                          "vaultName": "vault",
+                          "navExclude": false,
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "rh9hcb7wtoodm4zbkdng8wd",
+          "title": "Stackbit",
+          "icon": "plusOutlined",
+          "hasTitleNumberOutlined": false,
+          "vaultName": "vault",
+          "navExclude": false,
+          "children": [
+            {
+              "key": "awkaal4bqtqzhdsc49034rn",
+              "title": "System Architecture",
+              "icon": null,
+              "hasTitleNumberOutlined": false,
+              "vaultName": "vault",
+              "navExclude": false,
+              "children": [
+                {
+                  "key": "244wzvzc0dha8wknfu73kfz",
+                  "title": "Annotations System",
+                  "icon": null,
+                  "hasTitleNumberOutlined": false,
+                  "vaultName": "vault",
+                  "navExclude": false,
+                  "children": []
+                },
+                {
+                  "key": "xto5u8xvlbi0e2wiwh1a1to",
+                  "title": "Global Presets Implementation Notes",
+                  "icon": null,
+                  "hasTitleNumberOutlined": false,
+                  "vaultName": "vault",
+                  "navExclude": false,
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "fhngva5d1pz4yxj3fvhqdmm",
+          "title": "Wbs",
+          "icon": "plusOutlined",
+          "hasTitleNumberOutlined": false,
+          "vaultName": "vault",
+          "navExclude": false,
+          "children": [
+            {
+              "key": "qtutyha7eocui20l6e6hk74",
+              "title": "Component Presets WBS",
+              "icon": null,
+              "hasTitleNumberOutlined": false,
+              "vaultName": "vault",
+              "navExclude": false,
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "child2parent": {
+    "403": null,
+    "tjo6ofe6jnmhoiu439b1w5m": null,
+    "zo0dkyv7938yq1gcx8uuziy": "tjo6ofe6jnmhoiu439b1w5m",
+    "l02m7lpqwqo79nush714k29": "zo0dkyv7938yq1gcx8uuziy",
+    "ete4j3cuiq0ih0pi0o3aao3": "l02m7lpqwqo79nush714k29",
+    "ilbjp6rq879dcc2sdkjx4tg": "ete4j3cuiq0ih0pi0o3aao3",
+    "4dwcymngpio7nlu39c4ja7r": "ilbjp6rq879dcc2sdkjx4tg",
+    "tq7vt8nv3jk1860gz5pk59s": "ilbjp6rq879dcc2sdkjx4tg",
+    "b0t8el1x3b5cb7qz1m9g9zg": "ilbjp6rq879dcc2sdkjx4tg",
+    "b3w46cf4yjy2d8iitxoymmb": "ilbjp6rq879dcc2sdkjx4tg",
+    "rusgp2b9zse8au65qii1azk": "ete4j3cuiq0ih0pi0o3aao3",
+    "d4se6e2fhbutosewbbta81a": "rusgp2b9zse8au65qii1azk",
+    "oicfg9xisnq8qmv9z77zqa9": "rusgp2b9zse8au65qii1azk",
+    "q7aj38uv8dnumqrpxn10vk6": "rusgp2b9zse8au65qii1azk",
+    "upmbvixmnzovjmnp9whjagp": "rusgp2b9zse8au65qii1azk",
+    "fhngva5d1pz4yxj3fvhqdmm": "tjo6ofe6jnmhoiu439b1w5m",
+    "qtutyha7eocui20l6e6hk74": "fhngva5d1pz4yxj3fvhqdmm",
+    "rh9hcb7wtoodm4zbkdng8wd": "tjo6ofe6jnmhoiu439b1w5m",
+    "awkaal4bqtqzhdsc49034rn": "rh9hcb7wtoodm4zbkdng8wd",
+    "xto5u8xvlbi0e2wiwh1a1to": "awkaal4bqtqzhdsc49034rn",
+    "244wzvzc0dha8wknfu73kfz": "awkaal4bqtqzhdsc49034rn"
+  }
+}

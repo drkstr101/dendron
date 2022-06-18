@@ -1,0 +1,65 @@
+<h1 id="2022-06-12"><a aria-hidden="true" class="anchor-heading" href="#2022-06-12"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>2022-06-12</h1>
+<h2 id="annotation-updates"><a aria-hidden="true" class="anchor-heading" href="#annotation-updates"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>Annotation Updates</h2>
+<p><strong>TL;DR</strong> Rather than hard coding error messages at the source, provide additional attributes in the error object so we can delegate all message formatting concerns to the logger service.</p>
+<ol>
+<li>
+<p>Refactor existing type <code>AnnotationError</code> => <code>FieldError</code> (this is an unrelated type)</p>
+</li>
+<li>
+<p>Update global state types:</p>
+<pre class="language-ts"><code class="language-ts"><span class="token keyword module">export</span> <span class="token keyword">const</span> <span class="token constant">ANNOTATION_ERROR</span> <span class="token operator">=</span> <span class="token string">'AnnotationError'</span><span class="token punctuation">;</span>
+<span class="token keyword module">export</span> <span class="token keyword">const</span> <span class="token constant">OBJECT_ID_NOT_FOUND</span> <span class="token operator">=</span> <span class="token string">'OBJECT_ID_NOT_FOUND'</span><span class="token punctuation">;</span>
+<span class="token keyword module">export</span> <span class="token keyword">const</span> <span class="token constant">PARENT_FIELD_PATH_NOT_FOUND</span> <span class="token operator">=</span> <span class="token string">'PARENT_FIELD_PATH_NOT_FOUND'</span><span class="token punctuation">;</span>
+<span class="token keyword module">export</span> <span class="token keyword">const</span> <span class="token constant">PARENT_OBJECT_ID_NOT_FOUND</span> <span class="token operator">=</span> <span class="token string">'PARENT_OBJECT_ID_NOT_FOUND'</span><span class="token punctuation">;</span>
+<span class="token keyword module">export</span> <span class="token keyword">const</span> <span class="token constant">FIELD_NOT_FOUND</span> <span class="token operator">=</span> <span class="token string">'FIELD_NOT_FOUND'</span><span class="token punctuation">;</span>
+<span class="token keyword module">export</span> <span class="token keyword">const</span> <span class="token constant">MULTIPLE_CONTAINER_OBJECTS</span> <span class="token operator">=</span> <span class="token string">'MULTIPLE_CONTAINER_OBJECTS'</span><span class="token punctuation">;</span>
+
+<span class="token keyword module">export</span> <span class="token keyword">type</span> <span class="token class-name"><span class="token maybe-class-name">AnnotationErrorType</span></span> <span class="token operator">=</span>
+    <span class="token operator">|</span> <span class="token keyword">typeof</span> <span class="token constant">OBJECT_ID_NOT_FOUND</span>
+    <span class="token operator">|</span> <span class="token keyword">typeof</span> <span class="token constant">PARENT_FIELD_PATH_NOT_FOUND</span>
+    <span class="token operator">|</span> <span class="token keyword">typeof</span> <span class="token constant">PARENT_OBJECT_ID_NOT_FOUND</span>
+    <span class="token operator">|</span> <span class="token keyword">typeof</span> <span class="token constant">FIELD_NOT_FOUND</span>
+    <span class="token operator">|</span> <span class="token keyword">typeof</span> <span class="token constant">MULTIPLE_CONTAINER_OBJECTS</span><span class="token punctuation">;</span>
+
+<span class="token keyword module">export</span> <span class="token keyword">interface</span> <span class="token class-name"><span class="token known-class-name class-name">FieldError</span></span> <span class="token punctuation">{</span>
+    message<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+    annotationXPath<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+    elementXPath<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+    attrValue<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+    type<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword module">export</span> <span class="token keyword">interface</span> <span class="token class-name"><span class="token maybe-class-name">AnnotationsTreeFieldPath</span></span> <span class="token punctuation">{</span>
+    oid<span class="token operator">:</span> <span class="token builtin">string</span> <span class="token operator">|</span> <span class="token keyword null nil">null</span><span class="token punctuation">;</span>
+    fp<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+    loc<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+    hasOnlyTextNodes<span class="token operator">?</span><span class="token operator">:</span> <span class="token builtin">boolean</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword module">export</span> <span class="token keyword">interface</span> <span class="token class-name"><span class="token known-class-name class-name">FieldPathError</span></span> <span class="token punctuation">{</span>
+    message<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+    fieldPath<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+    elementXPath<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+    value<span class="token operator">:</span> <span class="token maybe-class-name">AnnotationsTreeFieldPath</span><span class="token punctuation">;</span>
+    type<span class="token operator">:</span> <span class="token keyword">typeof</span> <span class="token constant">ANNOTATION_ERROR</span><span class="token punctuation">;</span>
+    kind<span class="token operator">:</span> <span class="token maybe-class-name">AnnotationErrorType</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword module">export</span> <span class="token keyword">type</span> <span class="token class-name"><span class="token known-class-name class-name">AnnotationError</span></span> <span class="token operator">=</span> <span class="token known-class-name class-name">FieldError</span> <span class="token operator">|</span> <span class="token known-class-name class-name">FieldPathError</span><span class="token punctuation">;</span>
+
+<span class="token keyword module">export</span> <span class="token keyword">interface</span> <span class="token class-name"><span class="token maybe-class-name">State</span></span> <span class="token punctuation">{</span>
+    fetchFieldsError<span class="token operator">:</span> <span class="token known-class-name class-name">Error</span> <span class="token operator">|</span> <span class="token keyword null nil">null</span><span class="token punctuation">;</span>
+    fieldsErrors<span class="token operator">:</span> <span class="token known-class-name class-name">FieldError</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    clientAnnotationErrors<span class="token operator">:</span> <span class="token known-class-name class-name">AnnotationError</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token comment">// ...</span>
+<span class="token punctuation">}</span>
+
+</code></pre>
+</li>
+<li>
+<p>Update <code>logAnnotationErrors</code> to provide all message formatting logic (previously encoded in <code>message</code> attribute)</p>
+</li>
+<li>
+<p>Add a step to group errors by elementXPath prefix, display related errors as a single group.</p>
+</li>
+</ol>

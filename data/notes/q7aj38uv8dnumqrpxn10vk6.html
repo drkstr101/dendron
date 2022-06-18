@@ -1,0 +1,205 @@
+<h1 id="2022-05-26"><a aria-hidden="true" class="anchor-heading" href="#2022-05-26"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>2022-05-26</h1>
+<h2 id="minimal-examples"><a aria-hidden="true" class="anchor-heading" href="#minimal-examples"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>Minimal Examples</h2>
+<p>The goal of this experiment was to produce 3 minimal examples using only the online documentation as a guide. These examples highlight the differences between CMS providers by providing a common model and runtime implementation shared across the examples.</p>
+<p>Tested providers:</p>
+<ul>
+<li>git</li>
+<li>contentful</li>
+<li>custom</li>
+</ul>
+<p>conclusion: The documentation was easy to follow, seemed complete, and there were hardly any issues writing each implementation to run locally on the first try. However, <strong>in the end, not a single one was editable in Stackbit.</strong></p>
+<h3 id="content-model"><a aria-hidden="true" class="anchor-heading" href="#content-model"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>Content Model</h3>
+<p>We will keep the model as small as possible to reduce the potential source of errors.</p>
+<pre class="language-ts"><code class="language-ts">
+<span class="token doc-comment comment">/**
+ * Loaded into commonProps as `site`
+ */</span>
+<span class="token keyword">interface</span> <span class="token class-name"><span class="token maybe-class-name">SiteConfig</span></span> <span class="token punctuation">{</span>
+  title<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token doc-comment comment">/**
+ * A simple page model.
+ */</span>
+<span class="token keyword">interface</span> <span class="token class-name"><span class="token maybe-class-name">Page</span></span>
+  title<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+  body<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+  slug<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h3 id="component-implementation"><a aria-hidden="true" class="anchor-heading" href="#component-implementation"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>Component Implementation</h3>
+<p>We should be able to rely on sourcebit to abstract away differences in model sources for greater code reuse in the UI.</p>
+<p><strong>Example</strong></p>
+<pre class="language-tsx"><code class="language-tsx"><span class="token keyword module">import</span> <span class="token imports"><span class="token maybe-class-name">Head</span></span> <span class="token keyword module">from</span> <span class="token string">"next/head"</span><span class="token punctuation">;</span>
+<span class="token keyword module">import</span> <span class="token imports"><span class="token punctuation">{</span> sourcebitDataClient <span class="token punctuation">}</span></span> <span class="token keyword module">from</span> <span class="token string">"sourcebit-target-next"</span><span class="token punctuation">;</span>
+<span class="token keyword module">import</span> <span class="token imports"><span class="token punctuation">{</span> toObjectId<span class="token punctuation">,</span> toFieldPath <span class="token punctuation">}</span></span> <span class="token keyword module">from</span> <span class="token string">"@stackbit/annotations"</span><span class="token punctuation">;</span>
+<span class="token keyword module">import</span> <span class="token imports"><span class="token punctuation">{</span> withRemoteDataUpdates <span class="token punctuation">}</span></span> <span class="token keyword module">from</span> <span class="token string">"sourcebit-target-next/with-remote-data-updates"</span><span class="token punctuation">;</span>
+<span class="token keyword module">import</span> <span class="token imports">styles</span> <span class="token keyword module">from</span> <span class="token string">"../styles/Home.module.css"</span><span class="token punctuation">;</span>
+
+<span class="token keyword module">export</span> <span class="token keyword">function</span> <span class="token function"><span class="token maybe-class-name">DynamicPage</span></span><span class="token punctuation">(</span><span class="token punctuation">{</span> site<span class="token punctuation">,</span> page <span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword control-flow">return</span> <span class="token punctuation">(</span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;</span>div</span> <span class="token attr-name">className</span><span class="token script language-javascript"><span class="token script-punctuation punctuation">=</span><span class="token punctuation">{</span>styles<span class="token punctuation">.</span><span class="token property-access">container</span><span class="token punctuation">}</span></span><span class="token punctuation">></span></span><span class="token plain-text">
+      </span><span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;</span><span class="token class-name">Head</span></span><span class="token punctuation">></span></span><span class="token plain-text">
+        </span><span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;</span>title</span><span class="token punctuation">></span></span><span class="token punctuation">{</span>site<span class="token punctuation">.</span><span class="token property-access">title</span><span class="token punctuation">}</span><span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;/</span>title</span><span class="token punctuation">></span></span><span class="token plain-text">
+        </span><span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;</span>link</span> <span class="token attr-name">rel</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>icon<span class="token punctuation">"</span></span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>/favicon.ico<span class="token punctuation">"</span></span> <span class="token punctuation">/></span></span><span class="token plain-text">
+      </span><span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;/</span><span class="token class-name">Head</span></span><span class="token punctuation">></span></span><span class="token plain-text">
+
+      </span><span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;</span>main</span> <span class="token attr-name">className</span><span class="token script language-javascript"><span class="token script-punctuation punctuation">=</span><span class="token punctuation">{</span>styles<span class="token punctuation">.</span><span class="token property-access">main</span><span class="token punctuation">}</span></span> <span class="token spread"><span class="token punctuation">{</span><span class="token spread operator">...</span><span class="token method function property-access">toObjectId</span><span class="token punctuation">(</span>page<span class="token punctuation">.</span><span class="token property-access">__metadata</span><span class="token punctuation">.</span><span class="token property-access">id</span><span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token punctuation">></span></span><span class="token plain-text">
+        </span><span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;</span>h1</span> <span class="token attr-name">className</span><span class="token script language-javascript"><span class="token script-punctuation punctuation">=</span><span class="token punctuation">{</span>styles<span class="token punctuation">.</span><span class="token property-access">title</span><span class="token punctuation">}</span></span> <span class="token spread"><span class="token punctuation">{</span><span class="token spread operator">...</span><span class="token method function property-access">toFieldPath</span><span class="token punctuation">(</span><span class="token string">"title"</span><span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token punctuation">></span></span><span class="token plain-text">
+          </span><span class="token punctuation">{</span>page<span class="token punctuation">.</span><span class="token property-access">title</span><span class="token punctuation">}</span><span class="token plain-text">
+        </span><span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;/</span>h1</span><span class="token punctuation">></span></span><span class="token plain-text">
+        </span><span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;</span>p</span> <span class="token attr-name">className</span><span class="token script language-javascript"><span class="token script-punctuation punctuation">=</span><span class="token punctuation">{</span>styles<span class="token punctuation">.</span><span class="token property-access">description</span><span class="token punctuation">}</span></span> <span class="token spread"><span class="token punctuation">{</span><span class="token spread operator">...</span><span class="token method function property-access">toFieldPath</span><span class="token punctuation">(</span><span class="token string">"body"</span><span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token punctuation">></span></span><span class="token plain-text">
+          </span><span class="token punctuation">{</span>page<span class="token punctuation">.</span><span class="token property-access">body</span><span class="token punctuation">}</span><span class="token plain-text">
+        </span><span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;/</span>p</span><span class="token punctuation">></span></span><span class="token plain-text">
+      </span><span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;/</span>main</span><span class="token punctuation">></span></span><span class="token plain-text">
+    </span><span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;/</span>div</span><span class="token punctuation">></span></span>
+  <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword module">export</span> <span class="token keyword">async</span> <span class="token keyword">function</span> <span class="token function">getStaticProps</span><span class="token punctuation">(</span><span class="token punctuation">{</span> params <span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> pagePath <span class="token operator">=</span>
+    <span class="token keyword">typeof</span> params<span class="token operator">?.</span>slug <span class="token operator">===</span> <span class="token string">"string"</span>
+      <span class="token operator">?</span> params<span class="token operator">?.</span>slug
+      <span class="token operator">:</span> <span class="token string">"/"</span> <span class="token operator">+</span> <span class="token punctuation">(</span>params<span class="token operator">?.</span>slug <span class="token operator">||</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token method function property-access">join</span><span class="token punctuation">(</span><span class="token string">"/"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">const</span> props <span class="token operator">=</span> <span class="token keyword control-flow">await</span> sourcebitDataClient<span class="token punctuation">.</span><span class="token method function property-access">getStaticPropsForPageAtPath</span><span class="token punctuation">(</span>pagePath<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword control-flow">return</span> <span class="token punctuation">{</span> props <span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword module">export</span> <span class="token keyword">async</span> <span class="token keyword">function</span> <span class="token function">getStaticPaths</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> paths <span class="token operator">=</span> <span class="token keyword control-flow">await</span> sourcebitDataClient<span class="token punctuation">.</span><span class="token method function property-access">getStaticPaths</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword control-flow">return</span> <span class="token punctuation">{</span>
+    paths<span class="token punctuation">,</span>
+    fallback<span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+  <span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword module">export</span> <span class="token keyword module">default</span> <span class="token function">withRemoteDataUpdates</span><span class="token punctuation">(</span><span class="token maybe-class-name">DynamicPage</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>In theory, there is no reason why this page couldn't be reused for all 3 examples, once the entries are correctly bucketed by <code>sourcebit-target-nextjs</code>. One should only need to modify <code>sourcebit.js</code> and <code>stackbit.yaml</code> to swap out a model source.</p>
+<h3 id="shared-utility-code"><a aria-hidden="true" class="anchor-heading" href="#shared-utility-code"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>Shared Utility Code</h3>
+<p>Ideally, we should also be able to rely on a some common  __metadata fields that allows us to reuse common utility code as well.</p>
+<p><strong>Example</strong></p>
+<pre class="language-ts"><code class="language-ts"><span class="token punctuation">{</span>
+    module<span class="token operator">:</span> <span class="token keyword">require</span><span class="token punctuation">(</span><span class="token string">'sourcebit-target-next'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    options<span class="token operator">:</span> <span class="token punctuation">{</span>
+        <span class="token function-variable function">pages</span><span class="token operator">:</span> <span class="token keyword">function</span> <span class="token punctuation">(</span>objects<span class="token punctuation">,</span> utils<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword control-flow">return</span> objects<span class="token punctuation">.</span><span class="token method function property-access">reduce</span><span class="token punctuation">(</span><span class="token punctuation">(</span>pages<span class="token punctuation">,</span> page<span class="token punctuation">)</span> <span class="token arrow operator">=></span> <span class="token punctuation">{</span>
+                <span class="token keyword control-flow">if</span> <span class="token punctuation">(</span>page<span class="token punctuation">.</span><span class="token property-access">__metadata</span><span class="token punctuation">.</span><span class="token property-access">modelName</span> <span class="token operator">===</span> <span class="token string">'Page'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token keyword control-flow">return</span> pages<span class="token punctuation">.</span><span class="token method function property-access">concat</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+                        path<span class="token operator">:</span> <span class="token string">'{slug}'</span><span class="token punctuation">,</span>
+                        page
+                    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+
+                <span class="token keyword control-flow">return</span> pages<span class="token punctuation">;</span>
+            <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token function-variable function">commonProps</span><span class="token operator">:</span> <span class="token keyword">function</span> <span class="token punctuation">(</span>objects<span class="token punctuation">,</span> utils<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword control-flow">return</span> <span class="token punctuation">{</span>
+                site<span class="token operator">:</span> objects<span class="token punctuation">.</span><span class="token method function property-access">find</span><span class="token punctuation">(</span><span class="token punctuation">(</span>object<span class="token punctuation">)</span> <span class="token arrow operator">=></span> object<span class="token punctuation">.</span><span class="token property-access">__metadata</span><span class="token punctuation">.</span><span class="token property-access">modelName</span> <span class="token operator">===</span> <span class="token string">'SiteConfig'</span><span class="token punctuation">)</span>
+            <span class="token punctuation">}</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>note: This functionality is not yet part of sourcebit, and may not even be one of its defined goals.</p>
+<h3 id="the-examples"><a aria-hidden="true" class="anchor-heading" href="#the-examples"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>The examples</h3>
+<h4 id="stackbit-examplesminimal-filesystem"><a aria-hidden="true" class="anchor-heading" href="#stackbit-examplesminimal-filesystem"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a><a href="https://github.com/stackbit-themes/stackbit-examples/tree/minimal-examples/minimal-filesystem">stackbit-examples/minimal-filesystem</a></h4>
+<p>Plugins: <code>sourcebit-source-filesystem</code>, <code>sourcebit-target-next</code></p>
+<h5 id="notes"><a aria-hidden="true" class="anchor-heading" href="#notes"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>Notes</h5>
+<ol>
+<li>
+<p>By default the <code>sourcebit-source-filesystem</code> plugin does not respect a user's domain model, and will apply opinionated transformations to it instead. This makes any code reuse impossible without writing custom plugins to override this behavior:</p>
+</li>
+<li>
+<p>All fields are placed in a <code>frontmatter</code> object, rather then kept at the top level of the entry.</p>
+</li>
+<li>
+<p>The resolved model name is not kept in metadata like other api based plugins</p>
+</li>
+<li>
+<p>An additional user defined method is needed to derive the slug from the file path, which wasn't very clear at first. </p>
+</li>
+</ol>
+<h5 id="validator-results"><a aria-hidden="true" class="anchor-heading" href="#validator-results"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>Validator results</h5>
+<pre><code>➜  minimal-filesystem git:(minimal-examples) ✗ yarn stackbit validate
+yarn run v1.22.18
+$ stackbit validate
+loading and validating Stackbit configuration from: stackbit-examples/minimal-filesystem
+  loaded 2 models:
+    ✔ Page
+    ✔ SiteConfig
+  ✔ configuration is valid
+loading and validating content from: stackbit-examples/minimal-filesystem
+  loaded 2 files in total (2 matched, 0 unmatched)
+  2 files matched to models:
+    SiteConfig: 1 files:
+      content/data/config.json
+    Page: 1 files:
+      content/pages/index.md
+  ✔ content files are valid
+✔ validation passed
+Done in 1.48s.
+</code></pre>
+<h4 id="stackbit-examplesminimal-contentful"><a aria-hidden="true" class="anchor-heading" href="#stackbit-examplesminimal-contentful"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a><a href="https://github.com/stackbit-themes/stackbit-examples/tree/minimal-examples/minimal-contentful">stackbit-examples/minimal-contentful</a></h4>
+<p>Plugins: <code>sourcebit-source-contentful</code>, <code>sourcebit-target-next</code></p>
+<h5 id="validation-results"><a aria-hidden="true" class="anchor-heading" href="#validation-results"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>Validation results</h5>
+<pre><code>➜  minimal-contentful git:(minimal-examples) yarn validate
+yarn run v1.22.18
+$ stackbit validate
+loading and validating Stackbit configuration from: stackbit-examples/minimal-contentful
+  loaded 3 models:
+    ✔ Page
+    ✔ SiteConfig
+  ✔ configuration is valid
+Done in 1.41s.
+</code></pre>
+<h4 id="stackbit-examplesminimal-sourcebit"><a aria-hidden="true" class="anchor-heading" href="#stackbit-examplesminimal-sourcebit"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a><a href="https://github.com/stackbit-themes/stackbit-examples/tree/minimal-examples/minimal-sourcebit">stackbit-examples/minimal-sourcebit</a></h4>
+<p>Plugins: <code>sourcebit-source-contentful</code>, <code>sourcebit-target-next</code>, <code>sourcebit-sample-plugin</code> (local)</p>
+<h5 id="notes-1"><a aria-hidden="true" class="anchor-heading" href="#notes-1"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>Notes</h5>
+<ol>
+<li>An additional field needs to be added to page models to use as a slug.</li>
+<li>Contains models merged in from file system and custom plugin</li>
+<li>Uses yarn workspaces to define plugin package</li>
+<li>It was unclear what to use as the <code>cmsName</code> in <code>stackbit.yaml</code>.</li>
+</ol>
+<h5 id="validator-results-1"><a aria-hidden="true" class="anchor-heading" href="#validator-results-1"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>Validator results</h5>
+<pre><code>➜  minimal-sourcebit git:(minimal-examples) ✗ yarn stackbit validate 
+yarn run v1.22.18
+$ stackbit validate
+loading and validating Stackbit configuration from: stackbit-examples/minimal-sourcebit
+  loaded 2 models:
+    ✔ Page
+    ✔ SiteConfig
+  ✔ configuration is valid
+loading and validating content from: stackbit-examples/minimal-sourcebit
+  loaded 1 files in total (1 matched, 0 unmatched)
+  1 files matched to models:
+    SiteConfig: 1 files:
+      content/data/config.json
+  ✔ content files are valid
+✔ validation passed
+Done in 1.42s.
+</code></pre>
+<h2 id="inconsistencies-w-documentation"><a aria-hidden="true" class="anchor-heading" href="#inconsistencies-w-documentation"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>Inconsistencies w/ documentation</h2>
+<p>Overall the documentation seemed very complete and consistent with what's in our themes, with only a few minor exceptions.</p>
+<h3 id="stackbityaml"><a aria-hidden="true" class="anchor-heading" href="#stackbityaml"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>stackbit.yaml</h3>
+<p>There appears to be a difference in how models are defined in git-based and api-based CMS. The documented method did not appear to work for the latter.</p>
+<p>Documented: (does not work with API-based CMS)</p>
+<pre class="language-yml"><code class="language-yml"><span class="token key atrule">contentModels</span><span class="token punctuation">:</span>
+  <span class="token key atrule">Page</span><span class="token punctuation">:</span>
+    <span class="token key atrule">isPage</span><span class="token punctuation">:</span> <span class="token boolean important">true</span>
+    <span class="token key atrule">urlPath</span><span class="token punctuation">:</span> <span class="token string">"/{slug}"</span>
+</code></pre>
+<p>Undocumented: (works in cms)</p>
+<pre class="language-yml"><code class="language-yml"><span class="token key atrule">models</span><span class="token punctuation">:</span>
+    <span class="token key atrule">Page</span><span class="token punctuation">:</span>
+        <span class="token key atrule">type</span><span class="token punctuation">:</span> page
+        <span class="token key atrule">urlPath</span><span class="token punctuation">:</span> <span class="token string">'/{slug}'</span>
+</code></pre>
+<h3 id="hoc-for-live-preview"><a aria-hidden="true" class="anchor-heading" href="#hoc-for-live-preview"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>HOC for live preview</h3>
+<p>The documentation refers to a different HOC to use when exporting page components than what is used in the starter template and themes. It was unclear which is the correct version to use.</p>
+<p><code>sourcebit-target-next/with-remote-data-updates</code></p>
+<p>vs</p>
+<p><code>sourcebit-target-next/hot-content-reload</code></p>
+<p>There was also a small error in the docs which actually had already had a PR to fix it submitted by a community member. I went ahead and merged it. </p>

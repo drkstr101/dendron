@@ -1,0 +1,73 @@
+<h1 id="global-presets-implementation-notes"><a aria-hidden="true" class="anchor-heading" href="#global-presets-implementation-notes"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>Global Presets Implementation Notes</h1>
+<h2 id="definitions"><a aria-hidden="true" class="anchor-heading" href="#definitions"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>Definitions</h2>
+<p>Item 1
+: Definition for Item 1</p>
+<p>Item 2
+: Definition for Item 2
+: Another definition for Item 2, with a <a href="http://www.example.com">link</a></p>
+<h2 id="implementation"><a aria-hidden="true" class="anchor-heading" href="#implementation"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>Implementation</h2>
+<h3 id="presets-service"><a aria-hidden="true" class="anchor-heading" href="#presets-service"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>Presets Service</h3>
+<p>Source: <a href="https://github.com/stackbit/stackbit/blob/master/packages/dev-common/src/services/presets-service.ts">presets-service.ts</a></p>
+<p>Test: <a href="https://github.com/stackbit/stackbit/blob/master/packages/dev-common/__tests__/presets-service.test.js">preset-service.test.js</a></p>
+<h4 id="api"><a aria-hidden="true" class="anchor-heading" href="#api"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>API</h4>
+<pre class="language-ts"><code class="language-ts"><span class="token keyword module">export</span> <span class="token keyword">interface</span> <span class="token class-name"><span class="token maybe-class-name">PresetDefinition</span></span> <span class="token punctuation">{</span>
+  label<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+  metadata<span class="token operator">:</span> <span class="token builtin">any</span><span class="token punctuation">;</span>
+  thumbnail<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword module">export</span> <span class="token keyword">interface</span> <span class="token class-name"><span class="token maybe-class-name">ReferenceBehavior</span></span> <span class="token punctuation">{</span>
+  behavior<span class="token operator">?</span><span class="token operator">:</span> <span class="token string">"copyReference"</span> <span class="token operator">|</span> <span class="token string">"duplicateContents"</span><span class="token punctuation">;</span>
+  nonDuplicatableModels<span class="token operator">?</span><span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+  duplicatableModels<span class="token operator">?</span><span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>Write the <code>PresetDefinition</code> to a presets directory then return the result:</p>
+<pre class="language-ts"><code class="language-ts"><span class="token keyword">interface</span> <span class="token class-name"><span class="token maybe-class-name">CreatePresetResponse</span></span> <span class="token punctuation">{</span>
+  files<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+  preset<span class="token operator">:</span> <span class="token punctuation">{</span>
+    modelName<span class="token operator">:</span> <span class="token builtin">any</span><span class="token punctuation">;</span>
+    thumbnail<span class="token operator">:</span> <span class="token builtin">string</span> <span class="token operator">|</span> <span class="token keyword nil">undefined</span><span class="token punctuation">;</span>
+    data<span class="token operator">:</span> <span class="token builtin">any</span><span class="token punctuation">;</span>
+    label<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+    metadata<span class="token operator">:</span> <span class="token builtin">any</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword module">export</span> <span class="token keyword">async</span> <span class="token keyword">function</span> <span class="token function">createPreset</span><span class="token punctuation">(</span>
+  dir<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">,</span>
+  fieldData<span class="token operator">:</span> <span class="token builtin">any</span><span class="token punctuation">,</span>
+  fieldDataPath<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  preset<span class="token operator">:</span> <span class="token maybe-class-name">PresetDefinition</span><span class="token punctuation">,</span>
+  referenceBehavior<span class="token operator">?</span><span class="token operator">:</span> <span class="token maybe-class-name">ReferenceBehavior</span> <span class="token operator">|</span> <span class="token keyword nil">undefined</span><span class="token punctuation">,</span>
+  logger<span class="token operator">?</span><span class="token operator">:</span> <span class="token builtin">any</span><span class="token punctuation">,</span>
+  dryRun<span class="token operator">?</span><span class="token operator">:</span> <span class="token builtin">boolean</span>
+<span class="token punctuation">)</span><span class="token operator">:</span> <span class="token known-class-name class-name">Promise</span><span class="token operator">&#x3C;</span><span class="token maybe-class-name">CreatePresetResponse</span><span class="token operator">></span><span class="token punctuation">;</span>
+</code></pre>
+<p>Delete a given preset id and return a list of deleted preset ids:</p>
+<pre class="language-ts"><code class="language-ts"><span class="token keyword module">export</span> <span class="token keyword">async</span> <span class="token keyword">function</span> <span class="token function">deletePreset</span><span class="token punctuation">(</span>
+  dir<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">,</span>
+  presetId<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">,</span>
+  logger<span class="token operator">?</span><span class="token operator">:</span> <span class="token builtin">any</span>
+<span class="token punctuation">)</span><span class="token operator">:</span> <span class="token known-class-name class-name">Promise</span><span class="token operator">&#x3C;</span><span class="token builtin">string</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">></span><span class="token punctuation">;</span>
+</code></pre>
+<h3 id="preset-loader"><a aria-hidden="true" class="anchor-heading" href="#preset-loader"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>Preset Loader</h3>
+<p>Source: <a href="https://github.com/stackbit/stackbit/blob/44ac86a2dedd4399269e11c5cd048522e0fe8fb7/packages/stackbit-sdk/src/config/presets-loader.ts">presets-loader.ts</a></p>
+<p>Helper function for loading presets from disk</p>
+<pre class="language-ts"><code class="language-ts"><span class="token keyword module">export</span> <span class="token keyword">interface</span> <span class="token class-name"><span class="token maybe-class-name">PresetsLoaderResult</span></span> <span class="token punctuation">{</span>
+  config<span class="token operator">:</span> <span class="token maybe-class-name">Config</span><span class="token punctuation">;</span>
+  errors<span class="token operator">:</span> <span class="token known-class-name class-name">ConfigPresetsError</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword module">export</span> <span class="token keyword">async</span> <span class="token keyword">function</span> <span class="token function">loadPresets</span><span class="token punctuation">(</span>
+  dirPath<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">,</span>
+  config<span class="token operator">:</span> <span class="token maybe-class-name">Config</span>
+<span class="token punctuation">)</span><span class="token operator">:</span> <span class="token known-class-name class-name">Promise</span><span class="token operator">&#x3C;</span><span class="token maybe-class-name">PresetsLoaderResult</span><span class="token operator">></span><span class="token punctuation">;</span>
+</code></pre>
+<h3 id="existing-ui-components"><a aria-hidden="true" class="anchor-heading" href="#existing-ui-components"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>Existing UI Components</h3>
+<ul>
+<li><a href="https://github.com/stackbit/stackbit-app/blob/1a055df1c0ee409e0ed9f4a80414e33aa084badf/src/components/studio/AddEntityModal">src/components/studio/AddEntityModal</a></li>
+<li><a href="https://github.com/stackbit/stackbit-app/blob/1a055df1c0ee409e0ed9f4a80414e33aa084badf/src/components/studio/common/AddEntity">src/components/studio/common/AddEntity</a></li>
+<li><a href="https://github.com/stackbit/stackbit-app/blob/1a055df1c0ee409e0ed9f4a80414e33aa084badf/src/components/studio/CreatePage">src/components/studio/CreatePage</a> (unused)</li>
+<li><a href="https://github.com/stackbit/stackbit-app/blob/1a055df1c0ee409e0ed9f4a80414e33aa084badf/src/components/studio/SavePreset">src/components/studio/SavePreset</a></li>
+</ul>

@@ -1,0 +1,112 @@
+<h1 id="component-presets-wbs"><a aria-hidden="true" class="anchor-heading" href="#component-presets-wbs"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>Component Presets WBS</h1>
+<p>Generate using <code>wbsm report</code>. Generates <code>wbs.project.html</code>.</p>
+<p>Feature Definition Example:</p>
+<pre class="language-markdown"><code class="language-markdown"><span class="token list punctuation">-</span> Unlinked (group work item's not linked to a story) {story="null"}
+<span class="token list punctuation">-</span> Higher-level user feature/story - <span class="token url">[<span class="token content">PRJ-001</span>](<span class="token url">https://github.com/brainlid/wbs_markdown/issues/1</span>)</span> (Initials) {story="001"}
+</code></pre>
+<p>Deliverable Item Examples:</p>
+<pre class="language-markdown"><code class="language-markdown"><span class="token list punctuation">-</span> [ ] incomplete item with estimated work size of 3 days {link=001 work=3d}
+<span class="token list punctuation">-</span> [ ] explicitly set confidence value (as percent) {link=001 work=3d confidence=20}
+<span class="token list punctuation">-</span> [ ] item with a note {link=001 work=3d note="shows up in the data table"}
+<span class="token list punctuation">-</span> [x] completed work item, 2 hours estimated {link=001 work=2h}
+<span class="token list punctuation">-</span> [x] completed work item, tracked actual time {link=001 work=2h actual=3.25h}
+</code></pre>
+<h2 id="stories"><a aria-hidden="true" class="anchor-heading" href="#stories"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>Stories</h2>
+<p>chart {#stories-chart}</p>
+<p>toggle {#stories-toggle}</p>
+<ul>
+<li><strong>000</strong>: General admin &#x26; project management {story="000"}</li>
+<li><strong>001</strong>: Icons for elements without presets {story="001"}</li>
+<li><strong>002</strong>: Add an ‘educational’ link to explain how to find other components that don’t have a preset {story="002"}</li>
+</ul>
+<h3 id="group-1---global-access-to-all-components"><a aria-hidden="true" class="anchor-heading" href="#group-1---global-access-to-all-components"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>Group 1 - Global access to all components</h3>
+<ul>
+<li><strong>101</strong>: Users can browse components, presets, and preset categories {story=101 group="Group 1"}</li>
+<li><strong>102</strong>: Users can’t delete non-user presets {story=102 group="Group 1"}</li>
+<li><strong>103</strong>: If there aren’t saved presets show empty state {story=103 group="Group 1"}</li>
+<li><strong>104</strong>: The presets label should show the preset category and link to it {story=104 group="Group 1"}</li>
+<li><strong>105</strong>: Relocation of + to add pages {story="105"}</li>
+</ul>
+<p>totals {#stories-total group="Group 1"}</p>
+<h3 id="group-2---contextual-access-to-add-a-component"><a aria-hidden="true" class="anchor-heading" href="#group-2---contextual-access-to-add-a-component"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>Group 2 - Contextual access to add a component</h3>
+<ul>
+<li><strong>201</strong>: Only components (and presets if they exist) available in context should be shown {story=201 group="Group 2"}</li>
+<li><strong>202</strong>: Required fields, if they exist, are not presented to the user until they have chosen a component and a preset or just a component {story=202 group="Group 2"}</li>
+<li><strong>203</strong>: If presets exist, it should not be possible to add a component without choosing a preset first.  {story=203 group="Group 2"}</li>
+<li><strong>204</strong>: the add page UI/UX should be changed to use the new modal and flow implemented to add components {story="204"}</li>
+</ul>
+<p>totals {#stories-total group="Group 2"}</p>
+<h3 id="total"><a aria-hidden="true" class="anchor-heading" href="#total"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>Total</h3>
+<p>totals {#stories-total}</p>
+<h2 id="component-presets-global-access"><a aria-hidden="true" class="anchor-heading" href="#component-presets-global-access"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>Component presets global access</h2>
+<p>filter {#display-filter}</p>
+<p>style {#display-style}</p>
+<p>level {#detail-level}</p>
+<h3 id="code"><a aria-hidden="true" class="anchor-heading" href="#code"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>Code</h3>
+<ul>
+<li>Project
+<ul>
+<li>Initial Discovery
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" checked disabled> Presets system implementation notes {work=1d link=000}</li>
+<li>Estimate
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" checked disabled> Product spec deep dive {work=1d link=000}</li>
+<li class="task-list-item"><input type="checkbox" disabled> Create work breakdown structure {work=1d link=000}</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>New UI Components
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled> Component presets side-panel button / actions {work=4h link="101"}</li>
+<li class="task-list-item"><input type="checkbox" disabled> Component presets layout {work=4h link="101"}</li>
+<li class="task-list-item"><input type="checkbox" disabled> Component presets list {work=1d link="101"}</li>
+<li class="task-list-item"><input type="checkbox" disabled> Component presets filter (Search) {work=1d link="101"}</li>
+<li class="task-list-item"><input type="checkbox" disabled> Component presets gallery (Search) {work=4h link="101"}</li>
+</ul>
+</li>
+<li>API Updates {new=true}
+<ul>
+<li>Database Migrations</li>
+</ul>
+</li>
+<li>Misc (uncategorized)
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled> Add an ‘educational’ link to explain how to find other components that don’t have a preset {work=2h link="002"}</li>
+<li class="task-list-item"><input type="checkbox" disabled> Create icon map {work=4h link="001"}</li>
+<li class="task-list-item"><input type="checkbox" disabled> the add page UI/UX should be changed to use the new modal and flow implemented to add components {work=1d link="204"}</li>
+<li class="task-list-item"><input type="checkbox" disabled> If presets exist, it should not be possible to add a component without choosing a preset first {work=4h link="203"}</li>
+<li class="task-list-item"><input type="checkbox" disabled> Required fields, if they exist, are not presented to the user until...   {work=4h link="202"}</li>
+<li class="task-list-item"><input type="checkbox" disabled> Only components (and presets if they exist) available in context should be shown {work=2d link="201"}</li>
+<li class="task-list-item"><input type="checkbox" disabled> Users can’t delete non-user presets {work=2h link="102"}</li>
+<li class="task-list-item"><input type="checkbox" disabled> If there aren’t saved presets show empty state {work=2h link="103"}</li>
+<li class="task-list-item"><input type="checkbox" disabled> The presets label should show the preset category and link to it {work=2h link="104"}</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="administrative"><a aria-hidden="true" class="anchor-heading" href="#administrative"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>Administrative</h3>
+<ul>
+<li>Administration
+<ul>
+<li>MR-1
+<ul>
+<li>Submission
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" checked disabled> <strong>105</strong> pull/1463 {work=2h link=105}</li>
+</ul>
+</li>
+<li>Code reviewed and updated
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled> <strong>105</strong> pull/1463 updated and merged {work=2h link=105}</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="raw-table-data"><a aria-hidden="true" class="anchor-heading" href="#raw-table-data"><svg aria-hidden="true" viewBox="0 0 16 16"><use xlink:href="#svg-link"></use></svg></a>Raw Table Data</h2>
+<p>table {#stories-table}</p>
