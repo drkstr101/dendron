@@ -52,8 +52,12 @@ workspace:
             L: low
         todoIntegration: false
         createTaskSelectionType: selection2link
+        taskCompleteStatus:
+            - done
+            - x
     graph:
         zoomSpeed: 1
+        createStub: false
     enableAutoCreateOnDefinition: false
     enableXVaultWikiLink: false
     enableRemoteVaultInit: true
@@ -65,6 +69,8 @@ workspace:
     maxPreviewsCached: 10
     maxNoteLength: 204800
     enableFullHierarchyNoteTitle: false
+    enableHandlebarTemplates: false
+    templateHierarchy: template
 preview:
     enableFMTitle: true
     enableNoteTitleForLink: true
@@ -75,7 +81,7 @@ preview:
     enableKatex: true
     automaticallyShowPreview: false
 publishing:
-    siteUrl: https://drkstr101.github.io/Dendron
+    siteUrl: https://drkstr101.github.io/dendron
     enableFMTitle: true
     enableNoteTitleForLink: true
     enableMermaid: true
@@ -103,3 +109,4 @@ publishing:
         action: useVault
         payload:
             - vault
+    enableTaskNotes: true
